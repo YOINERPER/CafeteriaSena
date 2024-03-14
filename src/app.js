@@ -4,6 +4,7 @@ import routesCategorias from "./v1/routes/categorias.routes.js";
 import routesLocation from "./v1/routes/localizacion.routes.js";
 import routesTokens from "./v1/routes/tokens.routes.js";
 import routesRoles from "./v1/routes/roles.routes.js";
+import routesProductos from "./v1/routes/productos.routes.js" ;
 import {swaggerDocs} from "./v1/swagger.js"
 import cors from "cors"
 
@@ -21,6 +22,7 @@ app.use(routesCategorias);
 app.use(routesLocation);
 app.use(routesTokens);
 app.use(routesRoles);
+app.use(routesProductos);
 
 
 

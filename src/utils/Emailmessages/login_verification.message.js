@@ -21,11 +21,11 @@ export const mensaje_Confirm_Login = async (email, nombre, codigo) => {
          
         <p>Asegúrate de mantener segura tu contraseña y no compartirla con nadie. Si olvidas tu contraseña en el futuro, puedes utilizar la opción "Olvidé mi contraseña" en la página de inicio de sesión para restablecerla.</p>
     
-        <p>¡Gracias por unirte a SenaLearn! Esperamos que disfrutes de tu experiencia en nuestra plataforma.
+        <p>¡Gracias por unirte a CafeteriaSena! Esperamos que disfrutes de tu experiencia en nuestra plataforma.
     
           Atentamente,
           
-          El Equipo de SenaLearn</p>
+          El Equipo de Cafeteria Sena</p>
       </div>`, // html body
     });
 }

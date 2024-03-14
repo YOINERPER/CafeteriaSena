@@ -8,7 +8,7 @@ export const mensajeEnviar = async (email, nombre, codigo, pass) => {
         text: "correo enviado desde node js", // plain text body
         html: `<div class="container-sm ">
         <p>
-          Te damos la bienvenida a SenaLear. Estamos emocionados de que te hayas unido a nuestra
+          Te damos la bienvenida a CafeSena.  Estamos emocionados de que te hayas unido a nuestra
           comunidad. Antes de comenzar, necesitamos verificar tu dirección de correo electrónico para garantizar la
           seguridad de tu cuenta.
         </p>
@@ -33,7 +33,7 @@ export const mensajeEnviar = async (email, nombre, codigo, pass) => {
     
           Atentamente,
           
-          El Equipo de SenaLearn</p>
+          El Equipo de CafeSena</p>
       </div>`, // html body
     });
 }
