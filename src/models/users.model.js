@@ -54,7 +54,7 @@ export const InsertUsers = ( datos) => {
 
         connection.query("INSERT INTO usuarios (Id_User,Nom_User,Ape_User,Ema_User,Pass_User,Id_Rol_FK, Est_Email_User) VALUES (?,?,?,?,?,?,?)", [Id_User, Nom_User, Ape_User, Ema_User, passEncripted, Id_Rol_FK, 0], (err, results, fields) => {
             if (err) {
-             
+                console.log(err)
                 const objError = {
                     errno: err.errno,
                     code: err.code

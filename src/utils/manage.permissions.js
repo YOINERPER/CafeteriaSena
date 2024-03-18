@@ -1,6 +1,6 @@
 
 export const adminPermissions = (rolId) => {
-    if (rolId != 2) {
+    if (rolId != 1) {
         return false
         
     }else{
@@ -10,7 +10,7 @@ export const adminPermissions = (rolId) => {
 }
 
 export const UserPermissions = (rolId) => {
-    if (rolId != 1) {
+    if (rolId != 2) {
         return false
         
     }else{

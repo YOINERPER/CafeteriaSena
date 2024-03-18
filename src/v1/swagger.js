@@ -26,7 +26,7 @@ const options = {
         }
     },
     apis: ['src/v1/routes/categorias.routes.js', 'src/v1/routes/users.routes.js',
-        'src/v1/routes/roles.routes.js','src/v1/routes/localizacion.routes.js','src/v1/routes/tokens.routes.js',
+        'src/v1/routes/roles.routes.js','src/v1/routes/productos.routes.js','src/v1/routes/localizacion.routes.js','src/v1/routes/tokens.routes.js',
        ],
 }
 

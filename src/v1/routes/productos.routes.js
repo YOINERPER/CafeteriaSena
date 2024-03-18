@@ -1,5 +1,5 @@
 import express from 'express';
-import {GetProductos , createProducts} from '../../controllers/producto.controller.js'
+import {GetProductos , createProducts, deleteProductos } from '../../controllers/producto.controller.js'
 import { verifyToken } from "../../middlewares/verifyToken.js";
 
 const routesProductos = express();
@@ -332,6 +332,6 @@ routesProductos.post('/api/v1/productos/create',verifyToken, createProducts);
  *               code: 400
  *               message: algo salió mal
  */
-routesProductos.put('/api/v1/productos/update/:id',verifyToken);
+routesProductos.delete('/api/v1/productos/delete/:id',verifyToken , deleteProductos);
 
 export default routesProductos;

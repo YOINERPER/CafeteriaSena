@@ -1,8 +1,9 @@
 import { connection } from "../database/db.js";
+
 //Obtiene las ordenes por id del usuario
-export const GetInv = (id) => {
+export const GetInventario = () => {
     return new Promise((resolve, reject) => {
-        connection.query("SELECT * FROM ordenes WHERE id = ?", [id], (err, result) => {
+        connection.query("SELECT * FROM inventario INNER JOIN productos ON inventario.producto_idFK = productos.id_Pro;",  (err, result) => {
 
             if (err) {
                 const objError = {
@@ -10,6 +11,7 @@ export const GetInv = (id) => {
                 }
                 reject(objError);
             } else {
+                
                 resolve(result);
             }
 

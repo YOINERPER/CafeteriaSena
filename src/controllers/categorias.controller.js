@@ -123,9 +123,6 @@ export const createCategories = async (req, res) => {
 
 
                     }
-
-
-
                 }
             }
 
@@ -137,13 +134,8 @@ export const createCategories = async (req, res) => {
 
             } else {
                 response(res, 500, 500, "something went wrong");
-
             }
-
-
         }
-
-
     })
 }
 
@@ -192,11 +184,6 @@ export const UpdateCategories = async (req, res) => {
 
                 }
 
-
-
-
-
-
             } else {
                 response(res, 401, 401, "You don't have permissions");
             }
@@ -212,9 +199,6 @@ export const UpdateCategories = async (req, res) => {
 
             }
         }
-
-
-
     })
 }
 
@@ -249,6 +233,7 @@ export const DeleteCategories = async (req, res) => {
 
                 response(res, 200, 200, responses);
 
+                
 
 
             } else {
@@ -267,8 +252,6 @@ export const DeleteCategories = async (req, res) => {
                 response(res, 500, 500, "something went wrong");
 
             }
-
         }
-
     })
 }

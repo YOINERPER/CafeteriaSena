@@ -155,6 +155,7 @@ export const regUser = async (req, res) => {
                     passEncripted: passEncripted,
                     Id_Rol_FK: 1,
                 }
+                console.log(DataEnv)
 
                 //insert data in database
                 const DataInsert = await InsertUsers(DataEnv);
@@ -193,8 +194,6 @@ export const regUser = async (req, res) => {
             } else {
                 response(res, 400, 107, "Email is registered");
             }
-
-
         }
 
 
