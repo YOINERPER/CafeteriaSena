@@ -3,7 +3,7 @@ import {GetRoles,GetRolesxId, createRoles,UpdateRoles} from '../../controllers/r
 import { verifyToken } from "../../middlewares/verifyToken.js";
 
 const routesRoles = express();
-
+//ALL OK
 /**
  * @swagger
  * /api/v1/roles:

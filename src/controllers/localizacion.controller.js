@@ -1,9 +1,11 @@
-import { getAllLoc, getAllLocUsers, InsertLocation, getLocxId, updateLocation } from '../models/localizacion.model.js'
+
 import { adminPermissions } from '../utils/manage.permissions.js';
 import jsonwebtoken from 'jsonwebtoken'
 import 'dotenv/config'
 import { response } from '../utils/responses.js';
-import { GetUserbyId } from '../models/users.model.js'
+import Localizacion from '../models/localizacion.model.js';
+import Usuario from '../models/users.model.js';
+
 const jwt = jsonwebtoken;
 
 
@@ -20,12 +22,12 @@ export const GetLocations = async (req, res) => {
             const adminPermiso = adminPermissions(Id_Rol_FK);
 
             if (adminPermiso) {
-                const locations = await getAllLoc();
+                const locations = await Localizacion.findAll();
 
-                if (locations.length > 0) {
+                if (locations) {
                     response(res, 200, 200, locations);
                 } else {
-                    response(res, 204, 204, locations);
+                    response(res, 404);
                 }
             } else {
                 response(res, 401, 401, "You don't have permissions");
@@ -55,32 +57,23 @@ export const GetLocationsxUser = async (req, res) => {
         try {
             const { id } = req.params;
 
-            if (id) {
+            //verify exist user
+            const user = await Usuario.findByPk(id)
 
-                //verify exist user
-                const user = await GetUserbyId(id)
+            if (!user) {
 
-                if (user.length < 1) {
-
-                    response(res, 400, 103, "user don't exist");
-
-                } else {
-
-                    const locations = await getAllLocUsers(id);
-
-                    if (locations.length > 0) {
-                        response(res, 200, 200, locations);
-                    } else {
-                        response(res, 204, 204, locations);
-                    }
-                }
-
+                response(res, 400, 103, "user don't exist");
 
             } else {
-                response(res, 400, 102, "Something went wrong");
+
+                const locations = await Localizacion.findOne({where:{Id_User_FK:id}});
+
+                if (locations) {
+                    response(res, 200, 200, locations);
+                } else {
+                    response(res, 404);
+                }
             }
-
-
 
         } catch (err) {
             if (err.errno) {
@@ -106,51 +99,40 @@ export const createLocations = async (req, res) => {
         }
 
         try {
-
-
             const { Dir_Ip, Id_User } = req.body;
 
-            if (!Dir_Ip || !Id_User) {
+            //verificamos que exista el usuario
+            const UserExists = await Usuario.findByPk(Id_User)
 
-                response(res, 400, 102, "Something went wrong");
+
+            if (!UserExists) {
+
+                response(res, 500, 103, "User don't exist");
 
             } else {
 
-                //verificamos que exista el usuario
-                const UserExists = await GetUserbyId(Id_User)
+                const { Id_Rol_FK } = data.user;
 
+                //verify user permissions
+                const adminPermiso = adminPermissions(Id_Rol_FK);
 
-                if (UserExists.length < 1) {
+                if (!adminPermiso) {
 
-                    response(res, 500, 103, "User don't exist");
-
+                    response(res, 403, 403, "you dont have permissions");
                 } else {
 
-                    const { Id_Rol_FK } = data.user;
-
-                    //verify user permissions
-                    const adminPermiso = adminPermissions(Id_Rol_FK);
-
-                    if (!adminPermiso) {
-
-                        response(res, 403, 403, "you dont have permissions");
-                    } else {
-
-                        //create category
-                        const datos = {
-                            Dir_Ip: Dir_Ip,
-                            Id_User: Id_User
-                        }
-
-                        const newLocation = await InsertLocation(datos);
-                        const objResp = {
-                            insertId: newLocation.insertId
-                        }
-                        response(res, 200, 200, objResp);
-
-
+                    //create category
+                    const datos = {
+                        Dir_Ip: Dir_Ip,
+                        Id_User_FK: Id_User
                     }
 
+                    const newLocation = await Localizacion.create(datos);
+                    if (newLocation) {
+                        response(res, 200, 200);
+                    } else {
+                        response(res, 500, 500, 'Error creating');
+                    }
 
 
                 }
@@ -158,15 +140,7 @@ export const createLocations = async (req, res) => {
 
         } catch (err) {
 
-            if (err.errno) {
-
-                response(res, 400, err.errno, err.code);
-
-            } else {
-                response(res, 500, 500, "something went wrong");
-
-            }
-
+            response(res, 500, 500, "something went wrong");
 
         }
 
@@ -196,20 +170,20 @@ export const UpdateLocations = async (req, res) => {
 
                 //verify exist location
                 let datosEnv;
-                const location = await getLocxId(id)
+                let location = await Localizacion.findByPk(id)
 
-                if (location.length < 1) {
+                if (!location) {
 
                     response(res, 500, 103, "Something went wrong");
 
                 } else {
-
+                    location = location.dataValues;
                     //user verify exist
                     if (datos.Id_User) {
 
-                        const userExist = await GetUserbyId(datos.Id_User);
+                        const userExist = await Usuario.findByPk(datos.Id_User);
 
-                        if (userExist.length < 1) {
+                        if (!userExist) {
 
                             response(res, 500, 103, "User don't exist");
 
@@ -217,31 +191,35 @@ export const UpdateLocations = async (req, res) => {
                         } else {
 
                             datosEnv = {
-                                Id_Loc: id,
-                                Dir_Ip: datos.Dir_Ip || location[0].Dir_Ip,
+                             
+                                Dir_Ip: datos.Dir_Ip || location.Dir_Ip,
                                 Id_User_FK: datos.Id_User
                             }
 
-                            const responses = await updateLocation(datosEnv)
-                            const objRes = {
-                                affectedRows: responses.affectedRows
+                            const responses = await Localizacion.update(datosEnv, {where: {Id_Loc: id}})
+                            if(responses){
+                                response(res, 200, 200);
+                            }else{
+                                response(res, 500, 500, 'Error updating');
                             }
-                            response(res, 200, 200, objRes);
+                          
                         }
 
                     } else {
 
                         datosEnv = {
-                            Id_Loc: id,
-                            Dir_Ip: datos.Dir_Ip || location[0].Dir_Ip,
-                            Id_User_FK: datos.Id_User || location[0].Id_User_FK
+                      
+                            Dir_Ip: datos.Dir_Ip || location.Dir_Ip,
+                            Id_User_FK: datos.Id_User || location.Id_User_FK
                         }
 
-                        const responses = await updateLocation(datosEnv)
-                        const objRes = {
-                            affectedRows: responses.affectedRows
+                        const responses = await Localizacion.update(datosEnv, {where: {Id_Loc: id}})
+                        
+                        if(responses){
+                            response(res, 200, 200);
+                        }else{
+                            response(res, 500, 500, 'Error updating');
                         }
-                        response(res, 200, 200, objRes);
 
                     }
 

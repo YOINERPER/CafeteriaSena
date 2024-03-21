@@ -1,15 +1,14 @@
-import mysql2 from "mysql2";
+import { Sequelize } from "sequelize";
 
-const mysql = mysql2;
-
-export const connection = mysql.createConnection({
+// Option 3: Passing parameters separately (other dialects)
+export const connection = new Sequelize('cafeteriadb', 'root', '', {
     host: 'localhost',
-    user: 'root',
-    database: 'cafeteriadb'
-})
+    dialect: 'mysql'
+});
 
-if(connection){
-    console.log("DB Connection success")
-}else{
-    console.log("DB connection error")
+try {
+    await connection.authenticate();
+    console.log('Connection has been established successfully.');
+  } catch (error) {
+    console.error('Unable to connect to the database:', error);
 }

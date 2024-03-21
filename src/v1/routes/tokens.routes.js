@@ -4,6 +4,8 @@ import { verifyToken } from "../../middlewares/verifyToken.js";
 
 const routesTokens = express();
 
+//ALL OK
+
 /**
  * @swagger
  * /api/v1/tokens:

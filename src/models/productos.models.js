@@ -1,90 +1,38 @@
 import { connection } from "../database/db.js";
+import { Sequelize, DataTypes } from "sequelize";
 
-export const getProductsModels = () => {
-    return new Promise((resolve, reject) => {
-        connection.query("SELECT * FROM productos", (err, result) => {
-            if (err){
-               const  objetodeError= {
-                errno:  err.errno,
-                codde:err.code
 
-                }
-                    reject(objetodeError)
-                }
-            else{
-                resolve(result)
-            }
-        })
+const Producto = connection.define('Producto', {
+   
+    PROD_ID: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      primaryKey:true,
+      autoIncrement:true,
 
-    })
-}
-export const createProductsModels = (datos) => {
-    return new Promise((resolve, reject) => {
-        connection.query("INSERT INTO productos (id_Pro, nombre_Pro,descripcion_Pro,precio_Pro,categoria_idFK ) VALUES (?,?,?,?,?)", [datos.id_Pro, datos.nombre_Pro, datos.descripcion_Pro,datos.precio_Pro,datos.categoria_idFK], (err, results) => {
-            if (err){
-                const objetodeError = {
-                    errno: err.errno,
-                    code: err.code
-                }
-                reject(objetodeError);
-            } else {
-                resolve(results);
-            }
-        });
-    });
-};
+    },
+    PROD_COD: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    PROD_NOM: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    PROD_DESC: {
+        type: DataTypes.DECIMAL(10,2),
+        allowNull: false,
+    },
+    PROD_PREC:{
+        type: DataTypes.STRING,
+        allowNull: true,
+        defaultValue:null,
+    },
+    CAT_ID_FK:{
+        type: DataTypes.INTEGER,
+        allowNull: false,
+    }
+    // Other model options go here
+  });
 
-export const getProID = (id) => {
-    return new Promise((resolve, reject) => {
-        connection.query("SELECT * FROM productos WHERE id_Pro = ?", [id], (err, result) => {
-
-            if (err) {
-                const objError = {
-                    errno: err.errno
-                }
-                reject(objError);
-            } else {
-                resolve(result);
-            }
-
-        })
-    })
-}
-
-export const UpdateProduc = (datos) => {
-    return new Promise((resolve, reject) => {
-
-        connection.query("UPDATE productos SET Nom_Cat= ? WHERE Id_Cat = ?",
-            [datos.Nom_Cat, datos.id], (err, result) => {
-                if (err) {
-                    const objError = {
-                        errno: err.errno
-                    }
-                    reject(objError);
-
-                } else {
-                    resolve(result);
-                }
-
-            });
-    })
-}
-
-export const deleteProduc = (id) => {
-    return new Promise((resolve, reject) => {
-        connection.query("DELETE FROM productos WHERE id_Pro = ?", [id], (err, result) => {
-            if (err) {
-                console.log(err);
-                const objError = {
-                    errno: err.errno,
-                    code: err.code
-                }
-                reject(objError);
-
-            } else {
-                resolve(result);
-
-            }
-        })
-    })
-}
+  export default Producto;

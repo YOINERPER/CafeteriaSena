@@ -3,7 +3,7 @@ import { verifyToken } from "../../middlewares/verifyToken.js";
 import { GetLocations, createLocations,UpdateLocations,GetLocationsxUser } from '../../controllers/localizacion.controller.js';
 
 const routesLocation = express();
-
+//all ok
 /**
  * @swagger
  * /api/v1/localizacion:
@@ -79,12 +79,12 @@ const routesLocation = express();
  *                 code: 400
  *                 message: algo salio mal
  */
-routesLocation.get('/api/v1/localizacion', verifyToken, GetLocations)
+routesLocation.get('/api/v1/localizaciones', verifyToken, GetLocations)
 /**
  * @swagger
  * /api/v1/localizacion/user/{id}:
  *   get:
- *     summary: Retorna la lista de todas las localizaciones de un determinado usuario (Solo rol de ADMIN).
+ *     summary: Retorna la lista de todas las localizaciones (Solo rol de ADMIN).
  *     parameters:
  *       - name: id
  *         in: path
@@ -162,7 +162,7 @@ routesLocation.get('/api/v1/localizacion', verifyToken, GetLocations)
  *                 code: 400
  *                 message: algo salio mal
  */
-routesLocation.get('/api/v1/localizacion/user/:id',verifyToken,GetLocationsxUser)
+routesLocation.get('/api/v1/localizaciones/user/:id',verifyToken,GetLocationsxUser)
 /**
  * @swagger
  * /api/v1/localizacion/create:
@@ -245,7 +245,7 @@ routesLocation.get('/api/v1/localizacion/user/:id',verifyToken,GetLocationsxUser
  *               code: 400
  *               message: algo salió mal
  */
-routesLocation.post('/api/v1/localizacion/create', verifyToken, createLocations)
+routesLocation.post('/api/v1/localizaciones/create', verifyToken, createLocations)
 /**
  * @swagger
  * /api/v1/localizacion/update/{id}:
@@ -336,6 +336,6 @@ routesLocation.post('/api/v1/localizacion/create', verifyToken, createLocations)
  *               code: 400
  *               message: algo salió mal
  */
-routesLocation.put('/api/v1/localizacion/update/:id', verifyToken, UpdateLocations)
+routesLocation.put('/api/v1/localizaciones/update/:id', verifyToken, UpdateLocations)
 
 export default routesLocation;

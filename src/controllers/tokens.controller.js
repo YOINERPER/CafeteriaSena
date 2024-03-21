@@ -1,9 +1,10 @@
-import { getAllTokens, getAllTokensUsers, InserTokens, getAllTokensxTipo, getAllTokensxId, UpdateToken } from "../models/tokens.model.js";
+
 import { response } from "../utils/responses.js";
 import jsonwebtoken from 'jsonwebtoken'
-import { InstPermissions, adminPermissions } from "../utils/manage.permissions.js";
-import { GetUserbyId } from "../models/users.model.js";
+import {adminPermissions } from "../utils/manage.permissions.js";
 import 'dotenv/config.js'
+import Token from "../models/tokens.model.js";
+import Usuario from "../models/users.model.js";
 const jwt = jsonwebtoken;
 
 export const GetAllTokens = async (req, res) => {
@@ -22,10 +23,12 @@ export const GetAllTokens = async (req, res) => {
 
                 if (adPermision) {
 
-                    const tokens = await getAllTokens();
-
-                    response(res, 200, 200, tokens);
-
+                    const tokens = await Token.findAll();
+                    if (tokens) {
+                        response(res, 200, 200, tokens);
+                    } else {
+                        response(res, 404, 404, 'Not found');
+                    }
 
                 } else {
                     response(res, 403, 403, "you dont have permissions");
@@ -44,7 +47,7 @@ export const GetAllTokens = async (req, res) => {
 
 }
 
-//get  TOKENS by user id
+//get  TOKENS by user id --ok
 export const GetTokenssxUser = async (req, res) => {
 
     jwt.verify(req.token, process.env.SECRETWORD, async (err, data) => {
@@ -60,43 +63,23 @@ export const GetTokenssxUser = async (req, res) => {
                 if (adPermision) {
                     const { id } = req.params;
 
-                    if (id) {
 
-                        //verify exist user
-                        const user = await GetUserbyId(id)
+                    const tokens = await Token.findOne({ where: { User_Id_FK: id } });
 
-                        if (user.length < 1) {
-
-                            response(res, 400, 103, "user don't exist");
-
-                        } else {
-
-                            const tokens = await getAllTokensUsers(id);
-
-                            if (tokens.length > 0) {
-                                response(res, 200, 200, tokens);
-                            } else {
-                                response(res, 204, 204, tokens);
-                            }
-                        }
-
-
+                    if (tokens) {
+                        response(res, 200, 200, tokens);
                     } else {
-                        response(res, 400, 102, "Something went wrong");
+                        response(res, 204, 204, tokens);
                     }
-                }
 
-
-
-            } catch (err) {
-                if (err.errno) {
-
-                    response(res, 400, err.errno, err.code);
 
                 } else {
-                    response(res, 500, 500, "something went wrong");
-
+                    response(res, 403, 403, "you dont have permissions");
                 }
+
+            } catch (err) {
+
+                response(res, 500, 500, "something went wrong");
             }
 
 
@@ -105,7 +88,7 @@ export const GetTokenssxUser = async (req, res) => {
 
 }
 
-//get  TOKENS by type
+//get  TOKENS by type --ok
 export const GetTokenssxTipo = async (req, res) => {
 
     jwt.verify(req.token, process.env.SECRETWORD, async (err, data) => {
@@ -123,28 +106,21 @@ export const GetTokenssxTipo = async (req, res) => {
 
                     if (tipo) {
 
-                        const tokens = await getAllTokensxTipo(tipo);
+                        const tokens = await Token.findOne({ where: { Tipo_token: tipo } });
 
-                        if (tokens.length > 0) {
+                        if (tokens) {
                             response(res, 200, 200, tokens);
                         } else {
-                            response(res, 204, 204, tokens);
+                            response(res, 404, 404, tokens);
                         }
                     }
 
                 }
 
-
-
             } catch (err) {
-                if (err.errno) {
 
-                    response(res, 400, err.errno, err.code);
+                response(res, 500, 500, "something went wrong");
 
-                } else {
-                    response(res, 500, 500, "something went wrong");
-
-                }
             }
 
 
@@ -153,35 +129,30 @@ export const GetTokenssxTipo = async (req, res) => {
 
 }
 
-// Insert Tokens
+// Insert Tokens --ok
 export const InsertToken = async (req, res) => {
 
     jwt.verify(req.token, process.env.SECRETWORD, async (err, data) => {
 
         if (err) {
             response(res, 500, 105, "Something went wrong");
-        }
-        // verify permissions
-        const { Id_Rol_FK } = data.user;
-        let adPermision = adminPermissions(Id_Rol_FK);
+        } else {
 
-        if (adPermision) {
+            // verify permissions
+            const { Id_Rol_FK } = data.user;
+            let adPermision = adminPermissions(Id_Rol_FK);
 
-            try {
+            if (adPermision) {
 
-                const { Token, Fec_Caducidad, Id_User, Tipo_token } = req.body;
+                try {
 
-                if (!Token || !Fec_Caducidad || !Id_User || !Tipo_token) {
-
-                    response(res, 400, 102, "Something went wrong");
-
-                } else {
+                    const { Tokens, Fec_Caducidad, Id_User, Tipo_token } = req.body;
+                    console.log(Tokens, Fec_Caducidad, Id_User, Tipo_token)
 
                     //verificamos que exista el usuario
-                    const UserExists = await GetUserbyId(Id_User)
+                    const UserExists = await Usuario.findByPk(Id_User);
 
-
-                    if (UserExists.length < 1) {
+                    if (!UserExists) {
 
                         response(res, 500, 103, "User don't exist");
 
@@ -189,46 +160,38 @@ export const InsertToken = async (req, res) => {
 
                         //create tokens
                         const datos = {
-                            codigo: Token,
-                            exp: Fec_Caducidad,
-                            Id_User: Id_User,
-                            tipo: Tipo_token
+                            Token: Tokens,
+                            Fec_Caducidad: Fec_Caducidad,
+                            User_Id_FK: Id_User,
+                            Tipo_token: Tipo_token
                         }
-                        console.log(datos)
 
-                        const newToken = await InserTokens(datos);
-                        const objResp = {
-                            insertId: newToken.insertId
+                        const newToken = await Token.create(datos);
+                        if (newToken) {
+                            response(res, 200);
+                        } else {
+                            response(res, 500, 500, "error creating token");
                         }
-                        response(res, 200, 200, objResp);
 
                     }
-                }
 
+                } catch (err) {
 
-            } catch (err) {
-
-                if (err.errno) {
-
-                    response(res, 400, err.errno, err.code);
-
-                } else {
                     response(res, 500, 500, "something went wrong");
-
                 }
 
-
+            } else {
+                response(res, 403, 403, "you dont have permissions");
             }
 
-        } else {
-            response(res, 403, 403, "you dont have permissions");
         }
+
 
 
     })
 }
 
-//update Tokens
+//update Tokens --ok
 export const UpdateTokens = async (req, res) => {
 
     jwt.verify(req.token, process.env.SECRETWORD, async (err, dat) => {
@@ -250,60 +213,56 @@ export const UpdateTokens = async (req, res) => {
                 let datosEnv;
 
                 //verify token exist
-                const token = await getAllTokensxId(id)
+                let token = await Token.findByPk(id)
 
-                if (token.length < 1) {
+                if (!token) {
 
-                    response(res, 500, 103, "Something went wrong");
+                    response(res, 404, 404, "Token not found");
 
                 } else {
+                    token = token.dataValues;
 
                     //user verify exist
                     if (datos.Id_User) {
 
-                        const userExist = await GetUserbyId(datos.Id_User);
-                        if (userExist.length < 1) {
+                        const userExist = await Usuario.findByPk(datos.Id_User);
+                        if (!userExist) {
 
                             response(res, 500, 103, "User don't exist");
 
                         } else {
 
                             datosEnv = {
-                                Id_Token: id,
-                                Token: datos.Token || token[0].Token,
+                                Token: datos.Tokens || token.Token,
                                 User_Id_FK: datos.Id_User,
-                                Fec_Caducidad: datos.Fec_Caducidad || token[0].Fec_Caducidad,
-                                Tipo_token: datos.Tipo_token || token[0].Tipo_token
+                                Fec_Caducidad: datos.Fec_Caducidad || token.Fec_Caducidad,
+                                Tipo_token: datos.Tipo_token || token.Tipo_token
                             }
 
-                            const responses = await UpdateToken(datosEnv)
-                            const objRes = {
-                                affectedRows: responses.affectedRows
+                            const responses = await Token.update(datosEnv, { where: { Id_Token: id } })
+                            if (responses) {
+                                response(res, 200, 200);
                             }
-                            response(res, 200, 200, objRes);
+
                         }
 
                     } else {
 
                         datosEnv = {
                             Id_Token: id,
-                            Token: datos.Token || token[0].Token,
-                            User_Id_FK: datos.Id_User || token[0].Id_User_FK,
-                            Fec_Caducidad: datos.Fec_Caducidad || token[0].Fec_Caducidad,
-                            Tipo_token: datos.Tipo_token || token[0].Tipo_token
+                            Token: datos.Token || token.Token,
+                            User_Id_FK: datos.Id_User || token.Id_User_FK,
+                            Fec_Caducidad: datos.Fec_Caducidad || token.Fec_Caducidad,
+                            Tipo_token: datos.Tipo_token || token.Tipo_token
                         }
 
-                        const responses = await UpdateToken(datosEnv)
-                        const objRes = {
-                            affectedRows: responses.affectedRows
+                        const responses = await Token.update(datosEnv, { where: { Id_Token: id } })
+
+                        if (responses) {
+                            response(res, 200, 200);
                         }
-                        response(res, 200, 200, objRes);
 
                     }
-
-
-
-
 
                 }
 
@@ -313,14 +272,7 @@ export const UpdateTokens = async (req, res) => {
 
         } catch (err) {
 
-            if (err.errno) {
-
-                response(res, 400, err.errno, err.code);
-
-            } else {
-                response(res, 500, 500, "something went wrong");
-
-            }
+            response(res, 500, 500, "something went wrong");
         }
 
     })

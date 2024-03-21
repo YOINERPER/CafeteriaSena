@@ -3,8 +3,7 @@ import {
   GetCategories,
   createCategories,
   GetCategoriesxId,
-  UpdateCategories,
-  DeleteCategories,
+  UpdateCategories
 } from "../../controllers/categorias.controller.js";
 import { verifyToken } from "../../middlewares/verifyToken.js";
 

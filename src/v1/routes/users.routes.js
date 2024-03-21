@@ -1,10 +1,11 @@
 import express from "express";
 import {getUsers, loginUser, regUser,ValidateEmail, ValidateCod, UpdateUserData, getUserxId} from "../../controllers/users.controller.js"
 import { verifyToken } from "../../middlewares/verifyToken.js";
+import validateUserCreate from "../../validators/users.validators.js";
 
 const userRoutes = express();
 
-//get all users
+//get all users ---OK ---
 /**
  * @swagger
  * /api/v1/users:
@@ -79,7 +80,7 @@ const userRoutes = express();
  */
 userRoutes.get('/api/v1/users', verifyToken, getUsers);
 
-//get user by id
+//get user by id ---ok ---
 /**
  * @swagger
  * /api/v1/users/{id}:
@@ -162,7 +163,7 @@ userRoutes.get('/api/v1/users', verifyToken, getUsers);
  */
 userRoutes.get('/api/v1/users/:id', verifyToken, getUserxId);
 
-//login user
+//login user ---OK ---
 
 /**
  * @swagger
@@ -279,7 +280,7 @@ userRoutes.get('/api/v1/users/:id', verifyToken, getUserxId);
  */
 userRoutes.post('/api/v1/login', loginUser);
 
-//User Register
+//User Register ---ok--
 
 /**
  * @swagger
@@ -350,7 +351,7 @@ userRoutes.post('/api/v1/login', loginUser);
  *                 code: 400
  *                 message: algo salio mal
  */
-userRoutes.post('/api/v1/register', regUser);
+userRoutes.post('/api/v1/register',validateUserCreate, regUser);
 
 //validate Email to Register
 /**
@@ -543,7 +544,7 @@ userRoutes.post('/api/v1/email_validate', ValidateEmail);
  *                 code: 400
  *                 message: algo salio mal
  */
-userRoutes.post('/api/v1/code_validate', ValidateCod);
+userRoutes.post('/api/v1/ip_validation', ValidateCod);
 
 //update user data
 

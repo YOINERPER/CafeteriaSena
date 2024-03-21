@@ -1,4 +1,4 @@
-import { getAllRoles, getRolById, getRolxName, createRol, updateRol } from '../models/roles.model.js'
+import Role from '../models/roles.model.js';
 import { adminPermissions } from '../utils/manage.permissions.js';
 import jsonwebtoken from 'jsonwebtoken'
 import 'dotenv/config'
@@ -19,12 +19,12 @@ export const GetRoles = async (req, res) => {
             const adminPermiso = adminPermissions(Id_Rol_FK);
 
             if (adminPermiso) {
-                const roles = await getAllRoles();
+                const roles = await Role.findAll();
 
-                if (roles.length > 0) {
+                if (roles) {
                     response(res, 200, 200, roles);
                 } else {
-                    response(res, 204, 204, roles);
+                    response(res, 404, 404,'Not Found');
                 }
             } else {
                 response(res, 401, 401, "You don't have permissions");
@@ -34,14 +34,8 @@ export const GetRoles = async (req, res) => {
 
     } catch (error) {
 
-        if (err.errno) {
-
-            response(res, 400, err.errno, err.code);
-
-        } else {
             response(res, 500, 500, "something went wrong");
 
-        }
     }
 
 }
@@ -54,31 +48,17 @@ export const GetRolesxId = async (req, res) => {
         try {
             const { id } = req.params;
 
-            if (id) {
+                const roles = await Role.findByPk(id);
 
-                const roles = await getRolById(id);
-
-                if (roles.length > 0) {
+                if (roles) {
                     response(res, 200, 200, roles);
                 } else {
-                    response(res, 204, 204, roles);
+                    response(res, 404, 404, roles);
                 }
 
-            } else {
-                response(res, 400, 102, "Something went wrong");
-            }
-
-
-
         } catch (err) {
-            if (err.errno) {
 
-                response(res, 400, err.errno, err.code);
-
-            } else {
                 response(res, 500, 500, "something went wrong");
-
-            }
         }
     })
 
@@ -107,55 +87,36 @@ export const createRoles = async (req, res) => {
 
                 const { Nom_Rol } = req.body;
 
-                if (!Nom_Rol) {
-
-                    response(res, 400, 102, "Something went wrong");
-
-                } else {
-
                     //verificamos que no exista un rol con el mismo nombre
-                    const rolExists = await getRolxName(Nom_Rol)
+                    const rolExists = await Role.findOne({where:{Nom_Rol: Nom_Rol}})
 
 
-                    if (rolExists.length > 0) {
+                    if (rolExists) {
 
                         response(res, 500, 107, "rol already exist");
 
                     } else {
-
-
 
                         //create a rol
                         const datos = {
                             Nom_Rol: Nom_Rol.toLowerCase()
                         }
 
-                        const newRol = await createRol(datos.Nom_Rol);
-                        const objResp = {
-                            insertId: newRol.insertId
+                        const newRol = await Role.create(datos);
+
+                        if(newRol){
+                            response(res,200)
+                        }else{
+                            response(res,500,500, "Error creating")
                         }
-                        response(res, 200, 200, objResp);
 
 
                     }
 
-
-
-                }
             }
 
         } catch (err) {
-
-            if (err.errno) {
-
-                response(res, 400, err.errno, err.code);
-
-            } else {
                 response(res, 500, 500, "something went wrong");
-
-            }
-
-
         }
 
 
@@ -183,28 +144,26 @@ export const UpdateRoles = async (req, res) => {
 
                 //verify exist ROL
                 let datosEnv;
-                const roles = await getRolById(id)
+                let roles = await Role.findByPk(id)
 
-                if (roles.length < 1) {
-
-                    response(res, 500, 103, "Something went wrong");
+                if (!roles) {
+                    response(res, 500, 103, "Rol don't exist");
 
                 } else {
-
+                    roles = roles.dataValues;
 
                     datosEnv = {
-                        Id_Rol : id,
-                        Nom_Rol: datos.Nom_Rol || roles[0].Nom_Rol
+                      
+                        Nom_Rol: datos.Nom_Rol || roles.Nom_Rol
                     }
 
-                  
-
-                    const responses = await updateRol(datosEnv)
-                    const objRes = {
-                        affectedRows: responses.affectedRows
+    
+                    const responses = await Role.update(datosEnv,{where:{ Id_Rol : id}})
+                    if(responses){
+                        response(res,200)
+                    }else{
+                        response(res,500,500, "Error updating")
                     }
-
-                    response(res, 200, 200, objRes);
                 }
 
             } else {
@@ -213,14 +172,8 @@ export const UpdateRoles = async (req, res) => {
 
         } catch (err) {
 
-            if (err.errno) {
-
-                response(res, 400, err.errno, err.code);
-
-            } else {
                 response(res, 500, 500, "something went wrong");
 
-            }
         }
 
 

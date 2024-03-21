@@ -1,5 +1,5 @@
 import express from 'express';
-import {GetProductos , createProducts, deleteProductos } from '../../controllers/producto.controller.js'
+import {GetProductos , createProducts,GetProductosId, updateProductos } from '../../controllers/producto.controller.js'
 import { verifyToken } from "../../middlewares/verifyToken.js";
 
 const routesProductos = express();
@@ -78,7 +78,7 @@ const routesProductos = express();
  *                 code: 400
  *                 message: algo salio mal
  */
-routesProductos.get('/api/v1/productos', GetProductos);
+routesProductos.get('/api/v1/products', GetProductos);
 
 /**
  * @swagger
@@ -161,7 +161,7 @@ routesProductos.get('/api/v1/productos', GetProductos);
  *                 code: 400
  *                 message: algo salio mal
  */
-routesProductos.get('/api/v1/productos/:id',verifyToken);
+routesProductos.get('/api/v1/products/:id', GetProductosId);
 
 /**
  * @swagger
@@ -243,7 +243,7 @@ routesProductos.get('/api/v1/productos/:id',verifyToken);
  *               code: 400
  *               message: algo salió mal
  */
-routesProductos.post('/api/v1/productos/create',verifyToken, createProducts);
+routesProductos.post('/api/v1/products/create',verifyToken, createProducts);
 
 /**
  * @swagger
@@ -332,6 +332,6 @@ routesProductos.post('/api/v1/productos/create',verifyToken, createProducts);
  *               code: 400
  *               message: algo salió mal
  */
-routesProductos.delete('/api/v1/productos/delete/:id',verifyToken , deleteProductos);
+routesProductos.put('/api/v1/products/update/:id',verifyToken, updateProductos);
 
 export default routesProductos;

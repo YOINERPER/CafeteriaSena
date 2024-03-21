@@ -9,7 +9,7 @@ export const adminPermissions = (rolId) => {
     }
 }
 
-export const UserPermissions = (rolId) => {
+export const EmplPermissions = (rolId) => {
     if (rolId != 2) {
         return false
         
@@ -18,7 +18,7 @@ export const UserPermissions = (rolId) => {
     }
 }
 
-export const InstPermissions = (rolId) => {
+export const ClientPermissions = (rolId) => {
     if (rolId != 3) {
         return false
         
